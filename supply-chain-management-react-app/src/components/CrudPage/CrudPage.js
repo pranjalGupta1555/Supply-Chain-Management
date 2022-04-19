@@ -1,15 +1,54 @@
 import Table from "../Table/Table";
 import './CrudPage.css';
 import NavMenu from "../NavMenu/NavMenu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from 'axios';
 
 const CrudPage = (props) => {
 
     const [tableName, setTableName] = useState("");
+    const [tableData, setTableData] = useState([]);
+    const [tableFields, setTableFields] = useState([])
 
     const selectTable = (selectedTableName) => {
         setTableName(selectedTableName);
+        getTableData();
     }
+
+    const getTableFields = () => {
+        fieldsArray = []
+        for(let k in tableData[0]) {
+            fieldsArray.push(k);
+        }
+        setTableFields(fieldsArray);
+    }
+
+    const getTableData = () => {
+            var config = {
+                method: 'post',
+                url: 'https://05f6-155-33-133-1.ngrok.io/select',
+                headers: { 
+                'Content-Type': 'application/json'
+                },
+                data: {
+                    "table_name": tableName
+                }
+            };
+            
+            axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response.data));
+                setTableData(response.data);
+                getTableFields();
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
+
+    useEffect(() => {
+        console.log(tableName);
+    }, [tableData])
 
     return (
         <div>
